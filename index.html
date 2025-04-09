@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Datumsrechner</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 1rem;
+      max-width: 600px;
+      margin: auto;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    input, button {
+      width: 100%;
+      padding: 0.7rem;
+      font-size: 1rem;
+      margin-top: 0.3rem;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      margin-top: 1.5rem;
+      border-radius: 5px;
+    }
+    .results {
+      margin-top: 2rem;
+      background: #f9f9f9;
+      padding: 1rem;
+      border-radius: 10px;
+    }
+    .results strong {
+      display: block;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Datumsrechner</h1>
+
+  <label>
+    Ausgangsdatum:
+    <input type="date" id="startDate" value="">
+  </label>
+
+  <label>
+    Anzahl Tage vor/zurück:
+    <input type="number" id="daysOffset" value="0">
+  </label>
+
+  <label>
+    Ziel-Datum zum Vergleichen:
+    <input type="date" id="targetDate">
+  </label>
+
+  <button onclick="calculate()">Berechnen</button>
+
+  <div class="results" id="results"></div>
+
+  <script>
+    // Standardwert: Heute
+    document.getElementById("startDate").valueAsDate = new Date();
+
+    function calculate() {
+      const startDate = new Date(document.getElementById("startDate").value);
+      const offset = parseInt(document.getElementById("daysOffset").value, 10);
+      const targetInput = document.getElementById("targetDate").value;
+      const resultDiv = document.getElementById("results");
+
+      if (isNaN(startDate.getTime())) {
+        resultDiv.innerHTML = "Bitte ein gültiges Ausgangsdatum eingeben.";
+        return;
+      }
+
+      const plusDate = new Date(startDate);
+      plusDate.setDate(startDate.getDate() + offset);
+
+      const minusDate = new Date(startDate);
+      minusDate.setDate(startDate.getDate() - offset);
+
+      let diffText = "Kein Ziel-Datum ausgewählt.";
+      if (targetInput) {
+        const targetDate = new Date(targetInput);
+        const timeDiff = targetDate.getTime() - startDate.getTime();
+        const dayDiff = Math.round(timeDiff / (1000 * 60 * 60 * 24));
+        const weekDiff = (dayDiff / 7).toFixed(2);
+        const monthDiff = (dayDiff / 30.44).toFixed(2); // Durchschnittliche Monatslänge
+
+        diffText = `
+          <strong>Unterschied:</strong>
+          ${Math.abs(dayDiff)} Tag(e),
+          ${Math.abs(weekDiff)} Woche(n),
+          ${Math.abs(monthDiff)} Monat(e)
+          ${dayDiff < 0 ? "vor" : "nach"} dem Ausgangsdatum.
+        `;
+      }
+
+      resultDiv.innerHTML = `
+        <strong>Ausgangsdatum:</strong> ${startDate.toDateString()}<br>
+        <strong>+ ${offset} Tag(e):</strong> ${plusDate.toDateString()}<br>
+        <strong>- ${offset} Tag(e):</strong> ${minusDate.toDateString()}<br><br>
+        ${diffText}
+      `;
+    }
+  </script>
+</body>
+</html>
